@@ -43,7 +43,7 @@ class Notes
     keyPress %= 12
     notes.each do |key, current|
       if keyPress == current
-        puts "#{key}----#{current}"
+        puts "#{key}"
         return
       end
     end
