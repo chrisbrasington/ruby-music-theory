@@ -1,4 +1,8 @@
 class Notes
+  # notes accessor
+  # little bit of weird ambiguity when say B# == C
+  # may ignore typed letter values and go off midi input only
+  # 12 different possible keys in an octive
   attr_accessor :notes
   
   def initialize
@@ -8,8 +12,8 @@ class Notes
     @notes["Bb"] = 1
     @notes["B"] = 2
     @notes["Cb"] = 2
-    @notes["B#"] = 3 
     @notes["C"] = 3
+    #@notes["B#"] = 3 
     @notes["C#"] = 4
     @notes["Db"] = 4
     @notes["D"] = 5
@@ -17,7 +21,7 @@ class Notes
     @notes["Eb"] = 6
     @notes["E"] = 7
     @notes["Fb"] = 7
-    @notes["E#"] = 8
+    #@notes["E#"] = 8
     @notes["F"] = 8
     @notes["F#"] = 9
     @notes["Gb"] = 9
@@ -26,6 +30,7 @@ class Notes
     @notes["G#"] = 11
   end
 
+  # print notes hash
   def prints
     @notes.each do |note|
       print note
@@ -33,6 +38,21 @@ class Notes
     puts
   end
   
+  # output letter from key press
+  def output(keyPress)
+    keyPress %= 12
+    notes.each do |key, current|
+      if keyPress == current
+        puts "#{key}----#{current}"
+        return
+      end
+    end
+  end
+
+  # transpose by user typed input
+  # will likely update for multiple input from midi-in
+  # hit enter
+  # then transpose to next midi-in hit
   def transpose
     puts "Enter note: "
     note = gets.chomp
