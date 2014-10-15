@@ -44,10 +44,8 @@ class Transcribe
     value = @@chromaticScale[(note.key+3)%12]
     if(value.size != 1)
       if @@lastKey < note.key
-        @@lastNote = value[0]
         value = value[0]
       else
-        @@lastNote = value[1]
         value = value[1]
       end
     end

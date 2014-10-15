@@ -28,11 +28,11 @@ class Note
 	end
 
 	def keyDown
-		return keyPress
+		keyPress
 	end
 
 	def keyUp
-		return !keyPress
+		!keyPress
 	end
 
 end
