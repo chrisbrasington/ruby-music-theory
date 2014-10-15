@@ -9,7 +9,7 @@ class Note
 
 	def initialize(current)
 		@keyPress = current[0][:data][0].equal?144
-		@key = current[0][:data][1]+3
+		@key = current[0][:data][1]
 		@velocity = current[0][:data][2]
 		@timeStamp = current[0][:timestamp]
 		@letter = Transcribe.keyToNote(self)
@@ -25,6 +25,14 @@ class Note
 		end
 		string +=  "velocity: #{velocity}\ttime: #{timeStamp}"
 		string
+	end
+
+	def keyDown
+		return keyPress
+	end
+
+	def keyUp
+		return !keyPress
 	end
 
 end

@@ -9,7 +9,9 @@ input.open do |input|
 
   loop do
     note = Note.new(input.gets)
-    puts note
+    if(note.keyDown)
+	    puts note
+	end
   end
 
 end

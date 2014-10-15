@@ -41,20 +41,18 @@ class Transcribe
 
   # translate key (int) to note letter
   def Transcribe.keyToNote(note)
-    value = @@chromaticScale[note.key%12]
-    if(value.size == 1)
-      @@lastKey = note.key
-      value
-    else
-      if @@lastKey == note.key
-        @@lastNote
-      elsif @@lastKey < note.key
+    value = @@chromaticScale[(note.key+3)%12]
+    if(value.size != 1)
+      if @@lastKey < note.key
         @@lastNote = value[0]
-        value[0]
+        value = value[0]
       else
-        @lastNote = value[1]
-        value[1]
+        @@lastNote = value[1]
+        value = value[1]
       end
     end
+    @@lastKey = note.key
+    @@lastNote = value
+    value
   end
 end
