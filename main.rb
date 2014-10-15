@@ -1,17 +1,14 @@
-require 'unimidi'
-load 'note.rb'
+load 'commands.rb'
 
-input = UniMIDI::Input.first
+commands = Commands.new
 
-input.open do |input|
-
-  puts "send some MIDI to your input now..."
-
-  loop do
-    note = Note.new(input.gets)
-    if(note.keyDown)
-	    puts note
+# run main menu of commands
+loop do
+	command = gets.chomp
+	if(command == 'quit' or command == 'q')
+		break
 	end
-  end
-
+	if(Commands.method_defined?(command))
+		commands.send(command)
+	end
 end

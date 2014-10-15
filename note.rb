@@ -1,4 +1,4 @@
-load 'transcribe.rb'
+load "transcribe.rb"
 
 # individual note
 class Note

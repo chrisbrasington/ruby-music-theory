@@ -1,6 +1,17 @@
-##chord-transpose (ruby)
+#chord-transpose (ruby)
 
-In the works. Input note (A,A#,Bb.. etc) and transpose amount and spits out transposed notes.
+In the works. Input, capture, and transpose chords from midi input.
 
-To do:
-    - input chord (interval of notes) and transpose entire piece
+###Implemented
+
+- debug midi input
+- midi key to note translation
+- chord capture
+
+###To-do
+
+- storing of chords
+- transposition of chords
+- output to midi
+- (possible) scale
+- other music theory magic
