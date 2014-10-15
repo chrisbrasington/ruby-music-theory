@@ -1,81 +1,77 @@
 class Notes
-  # notes accessor
-  # little bit of weird ambiguity when say B# == C
-  # may ignore typed letter values and go off midi input only
-  # 12 different possible keys in an octive
-  attr_accessor :notes
+  # chromaticScale: all possible note variations
+  # lastKey: 0 thru 120 on full size keyboard
+  #   used to determine if black key should be
+  #   sharpened or flatted by direction of interval
+  # lastNote: last evaulated note value
+  #   stored if flat/sharp key is pressed twice
+  attr_accessor :chromaticScale, :lastKey, :lastNote
   
   def initialize
-    @notes = Hash.new
-    @notes["A"] = 0
-    @notes["A#"] = 1
-    @notes["Bb"] = 1
-    @notes["B"] = 2
-    @notes["Cb"] = 2
-    @notes["C"] = 3
-    #@notes["B#"] = 3 
-    @notes["C#"] = 4
-    @notes["Db"] = 4
-    @notes["D"] = 5
-    @notes["D#"] = 6
-    @notes["Eb"] = 6
-    @notes["E"] = 7
-    @notes["Fb"] = 7
-    #@notes["E#"] = 8
-    @notes["F"] = 8
-    @notes["F#"] = 9
-    @notes["Gb"] = 9
-    @notes["G"] = 10
-    @notes["Ab"] = 11
-    @notes["G#"] = 11
+    @chromaticScale =
+    {
+        0 => "A",
+        1 => ["A#","Bb"],
+        2 => "B",
+        3 => "C",
+        4 => ["C#","Db"],
+        5 => "D",
+        6 => ["D#","Eb"],
+        7 => "E" ,
+        8 => "F",
+        9 => ["F#","Gb"],
+        10 => "G",
+        11 => ["G#","Ab"] 
+    }
+    @lastKey = 0
+    @lastNote = "A"
   end
 
-  # print notes hash
+  # print chromaticScale hash
   def prints
-    @notes.each do |note|
+    @chromaticScale.each do |note|
       print note
     end
     puts
   end
   
+  def keyToNote(key)
+    return @chromaticScale[(key[0][:data][1]+3)%12]
+  end
+
+  def keyToInt(key)
+    return key[0][:data][1]
+  end
+
   # output letter from key press
-  def output(keyPress)
-    keyPress %= 12
-    notes.each do |key, current|
-      if keyPress == current
-        puts "#{key}"
-        return
-      end
-    end
-  end
+  def output(key)
 
-  # transpose by user typed input
-  # will likely update for multiple input from midi-in
-  # hit enter
-  # then transpose to next midi-in hit
-  def transpose
-    puts "Enter note: "
-    note = gets.chomp
-    value = notes[note]
-    found = false
-    notes.each do |key, current|
-      if value == current
-        puts "#{key}----#{current}"
-        found = true
-      end
-    end
-    if (!found)
-      puts "Not a musical note or try caps lock."
+    puts key
+
+    note = keyToNote(key)
+    keyPress = keyToInt(key)
+
+    if(note.size == 1)
+      puts(note)
     else
-      puts "Enter Transpose amount:"
-      transpose = gets.chomp
-      value = (value.to_i+transpose.to_i)%12
-
-      notes.each do |key, current|
-        if value == current
-          puts "#{key}----#{current}"
-        end
+      if lastKey == keyPress
+        puts(@lastNote)
+      elsif lastKey < keyPress
+        puts(note[0])
+        @lastNote = note[0]
+      else
+        puts(note[1])
+        @lastNote = note[1]
       end
     end
+    
+    @lastKey = keyPress
+
+    return
   end
+
+  def isKeyPressDown(note)
+    return note[0][:data][0].equal?144
+  end
+
 end
