@@ -1,7 +1,7 @@
 # static class for translation of midi keys to note values
 class Transcribe
-  # chromaticScale: all possible note variations
-  @@chromaticScale =
+  # chromatic_scale: all possible note variations
+  @@chromatic_scale =
   {
       0 => 'A',
       1 => ['A#','Bb'],
@@ -16,41 +16,41 @@ class Transcribe
       10 => 'G',
       11 => ['G#','Ab'] 
   }
-  # lastKey: used to determine if black key should be
+  # last_key: used to determine if black key should be
   #   sharpened or flatted by direction of interval
-  @@lastKey = 0
+  @@last_key = 0
 
-  # lastNote: last evaulated note value
+  # last_note: last evaluated note value
   #   stored if flat/sharp key is pressed twice
-  @@lastNote = 'A'
+  @@last_note = 'A'
   
   # get chromatic scale
-  def Transcribe.getChromaticScale
-    @@chromaticScale
+  def Transcribe.get_chromatic_scale
+    @@chromatic_scale
   end
 
   # get last key (int) played
-  def Transcribe.lastKey
-    @@lastKey
+  def Transcribe.last_key
+    @@last_key
   end
 
   # get last note played
-  def Transcribe.lastNote
-    @@lastNote
+  def Transcribe.last_note
+    @@last_note
   end
 
   # translate key (int) to note letter
-  def Transcribe.keyToNote(note)
-    value = @@chromaticScale[(note.key+3)%12]
-    if(value.size != 1)
-      if @@lastKey < note.key
+  def Transcribe.key_to_note(note)
+    value = @@chromatic_scale[(note.key+3)%12]
+    if value.size != 1
+      if @@last_key < note.key
         value = value[0]
       else
         value = value[1]
       end
     end
-    @@lastKey = note.key
-    @@lastNote = value
+    @@last_key = note.key
+    @@last_note = value
     value
   end
 end

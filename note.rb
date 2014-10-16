@@ -4,35 +4,34 @@ load "transcribe.rb"
 class Note
 	
 	# letter value, key (int) 0-120 on full piano
-	# velocity and timestamp
-	attr_accessor :letter, :key, :keyPress, :velocity, :timeStamp
+	# velocity and time_stamp
+	attr_accessor :letter, :key, :key_press, :velocity, :time_stamp
 
 	def initialize(current)
-		@keyPress = current[0][:data][0].equal?144
+		@key_press = current[0][:data][0].equal?144
 		@key = current[0][:data][1]
 		@velocity = current[0][:data][2]
-		@timeStamp = current[0][:timestamp]
-		@letter = Transcribe.keyToNote(self)
+		@time_stamp = current[0][:timestamp]
+		@letter = Transcribe.key_to_note(self)
 	end
 
 	def to_s
 		string = "#{letter}\t" 
 		string += "key: #{key}\t\t"
-		if(@keyPress)
+		if @key_press
 			string += "press: down\t"
 		else
 			string +=  "press: up\t"
 		end
-		string +=  "velocity: #{velocity}\ttime: #{timeStamp}"
-		string
+		string +=  "velocity: #{velocity}\ttime: #{time_stamp}"
 	end
 
-	def keyDown
-		keyPress
+	def key_down
+		key_press
 	end
 
-	def keyUp
-		!keyPress
+	def key_up
+		!key_press
 	end
 
 end

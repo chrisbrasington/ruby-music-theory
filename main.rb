@@ -6,7 +6,7 @@ load 'chord.rb'
 # state observer
 class State
 	def update(input)
-		clear()
+		clear
 		puts "State changed."
 	end
 
@@ -20,7 +20,7 @@ end
 # handles concurrent midi and pc keyboard input
 class Input
 	include Observable
-	attr_accessor :midi, :midiThread, :keyboardThread, :notesBuffer, :recording
+	attr_accessor :midi, :midi_thread, :keyboard_thread, :notes_buffer, :recording
 
 	def initialize()
 		add_observer(State.new)
@@ -29,19 +29,19 @@ class Input
 		@midi = UniMIDI::Input.gets
 
 		# midi thread for input
-		@midiThread = Thread.new {
-			midiBegin()
+		@midi_thread = Thread.new {
+			midi_begin
 		}
 		# keyboard thread for input
-		@keyboardThread = Thread.new {
-			keyboardBegin()
+		@keyboard_thread = Thread.new {
+			keyboard_begin
 		}
 
 		# show menu
-		menu()
+		menu
 
 		# loop forever until threads are killed
-		while(true)
+		while true
 		end
 	end
 
@@ -52,14 +52,14 @@ class Input
 	end
 
 	# continual midi input
-	def midiBegin()
+	def midi_begin()
 		@midi.open do |input|
 			loop do
 				note = Note.new(input.gets)
-				if(note.keyDown)
+				if note.key_down
 				    puts note
-				    if(recording)
-						@notesBuffer.push(note)
+				    if recording
+						@notes_buffer.push(note)
 					end
 				end
 			end
@@ -68,40 +68,41 @@ class Input
 
 	# continual keyboard input
 	# accepts commands
-	def keyboardBegin()
+	def keyboard_begin()
 		loop do
 			key = gets.chomp
-			if(!@recording)	
-				if(key == "q" or key == "quit")
-					changed
-					notify_observers(self)
-					puts "Quitting"
-					exit
-				elsif(key == "h" or key == "help")
-					changed 
-					notify_observers(self)
-					menu()
-				elsif(key == 'c' or key == 'chord')
-					changed 
-					notify_observers(self)
-					chordRecord()
-				else
-					puts "Unknown command"
-					menu()
-				end
+			if @recording
+        puts "Done Recording"
+        @recording = false
+        chord = Chord.new(@notes_buffer)
+        puts chord
 			else
-				puts "Done Recording"
-				@recording = false
-				chord = Chord.new(@notesBuffer)
-				puts chord
+        if key == "q" or key == "quit"
+          changed
+          notify_observers(self)
+          puts "Quitting"
+          exit
+        elsif key == "h" or key == "help"
+          changed
+          notify_observers(self)
+          menu
+        elsif key == 'c' or key == 'chord'
+          changed
+          notify_observers(self)
+          chord_record
+        else
+          puts "Unknown command"
+          menu
+        end
+
 			end
 		end
 	end
 
-	def chordRecord()
+	def chord_record()
 		puts "Recording..."
 		@recording = true
-		@notesBuffer = []
+		@notes_buffer = []
 	end
 
 end
