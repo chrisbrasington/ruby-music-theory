@@ -26,18 +26,18 @@ class Input
 		add_observer(State.new)
 		@recording = false
 
-		@midi = UniMIDI::Input.gets
+		@midi = UniMIDI::Input.first
 
 		# midi thread for input
 		@midi_thread = Thread.new {
 			midi_begin
 		}
-		# keyboard thread for input
+		#keyboard thread for input
 		@keyboard_thread = Thread.new {
 			keyboard_begin
 		}
 
-		# show menu
+		#show menu
 		menu
 
 		# loop forever until threads are killed
@@ -47,7 +47,8 @@ class Input
 
 	# menu of commands
 	def menu()
-		puts "Commands: c (chord record), h (help), q (quit)"
+		#puts "Commands: c (chord record), h (help), q (quit)"
+		puts "Commands: h (help), q (quit)"
 		puts "Debug Midi input running.."
 	end
 
@@ -55,13 +56,16 @@ class Input
 	def midi_begin()
 		@midi.open do |input|
 			loop do
-				note = Note.new(input.gets)
-				if note.key_down
-				    puts note
-				    if recording
-						@notes_buffer.push(note)
-					end
-				end
+				# note = Note.new(input.gets)
+				# if note.key_down
+				#     puts note
+				#     if recording
+				# 		@notes_buffer.push(note)
+				# 	end
+				# end
+				message = input.gets
+				Transcribe.message_to_notes(message)
+				#exit
 			end
 		end	
 	end
@@ -87,9 +91,9 @@ class Input
           notify_observers(self)
           menu
         elsif key == 'c' or key == 'chord'
-          changed
-          notify_observers(self)
-          chord_record
+          #changed
+          #notify_observers(self)
+          #chord_record
         else
           puts "Unknown command"
           menu

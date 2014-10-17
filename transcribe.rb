@@ -53,4 +53,39 @@ class Transcribe
     @@last_note = value
     value
   end
+
+  def Transcribe.message_to_notes(message)
+    found = false
+    data = message[0][:data]
+    time_stamp = message[0][:timestamp]
+    data.each_with_index do|num, index| 
+      if num == 144
+
+         key = data[index+1]
+         velocity = data[index+2]
+         if velocity != 0
+            if not found
+              #puts message
+              found = true
+            end
+            letter = @@chromatic_scale[(key+3)%12]
+            if letter.size != 1
+              if @@last_key < key
+                letter = letter[0]
+              else
+                letter = letter[1]
+              end
+            end
+            @@last_key = key
+            @@last_note = letter
+            print letter, ' '
+         end
+      end
+    end
+    if found
+      puts 
+    end
+
+
+  end
 end

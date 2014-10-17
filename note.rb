@@ -7,12 +7,17 @@ class Note
 	# velocity and time_stamp
 	attr_accessor :letter, :key, :key_press, :velocity, :time_stamp
 
-	def initialize(current)
-		@key_press = current[0][:data][0].equal?144
-		@key = current[0][:data][1]
-		@velocity = current[0][:data][2]
-		@time_stamp = current[0][:timestamp]
-		@letter = Transcribe.key_to_note(self)
+	def initialize(key, velocity, key_press, time_stamp)
+		@key = key
+		@velocity = velocity
+		@key_press = key_press
+		@time_stamp = time_stamp
+
+		#@key_press = current[0][:data][0].equal?144
+		#@key = current[0][:data][1]
+		#@velocity = current[0][:data][2]
+		#@time_stamp = current[0][:timestamp]
+		#@letter = Transcribe.key_to_note(self)
 	end
 
 	def to_s
