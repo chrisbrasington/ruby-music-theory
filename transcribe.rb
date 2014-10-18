@@ -70,7 +70,9 @@ class Transcribe
             end
             letter = @@chromatic_scale[(key+3)%12]
             if letter.size != 1
-              if @@last_key < key
+              if @@last_key == key
+                letter = @@last_note
+              elsif @@last_key < key
                 letter = letter[0]
               else
                 letter = letter[1]
