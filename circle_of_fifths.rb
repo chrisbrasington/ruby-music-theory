@@ -2,10 +2,10 @@ load 'chord.rb'
 
 
 note = Note.new(48, 80, true, Time.now.getutc)
-chord = Chord.new([note])
+scale = Chord.new([note])
 
 puts "\nC major chord\n\n"
-print "BEGIN\t",chord, "\n"
+print "BEGIN\t",scale, "\n"
 #puts chord
 
 for i in 1..7
@@ -17,40 +17,40 @@ for i in 1..7
     print "WHOLE \t"
     note.transpose(2)
   end
-  chord.add_note(note)
-  puts chord
+  scale.add_note(note)
+  puts scale
 end
 puts
 
 puts "Shifting through scales...","\n"
 
-letter = chord.notes[0].letter
+letter = scale.notes[0].letter
 puts "#{letter} major chord"
-puts chord, "\n"
+puts scale, "\n"
 
 for i in 1..7
 
   step = ""
   if(i==3 or i==7)
-    chord.transpose(1)
+    scale.transpose(1)
     step = 'HALF'
   else
-    chord.transpose(2)
+    scale.transpose(2)
     step = 'WHOLE'
   end
 
-  letter = chord.notes[0].letter
+  letter = scale.notes[0].letter
   puts "#{letter} major chord\t\t#{step} STEP"
-  puts chord, "\n"
+  puts scale, "\n"
 end
 
 puts "-----------------------------","\n"
 
-puts "Cirlce of fifths to the right...", "\n"
+puts "Circle of fifths to the right...", "\n"
 
-letter = chord.notes[0].letter
+letter = scale.notes[0].letter
 puts "#{letter} major chord"
-puts chord, "\n"
+puts scale, "\n"
 
 for i in 1..12
 
@@ -59,17 +59,17 @@ for i in 1..12
 
   step = ""
   if(i==3 or i==7)
-    chord.transpose(1+sixth)
+    scale.transpose(1+sixth)
     step = "HALF"
   else
-    chord.transpose(2+fifth)
+    scale.transpose(2+fifth)
     step = "WHOLE"
   end
 
-  letter = chord.notes[0].letter
+  letter = scale.notes[0].letter
   puts "#{letter} major chord\t\t#{step} STEP"
-  chord.fix_sharp_flats()
-  puts chord
+  scale.fix_sharp_flats()
+  puts scale
   puts
 end
 
@@ -77,9 +77,9 @@ puts "-----------------------------", "\n"
 
 puts "Circle of fifths to the left...", "\n"
 
-letter = chord.notes[0].letter
+letter = scale.notes[0].letter
 puts "#{letter} major chord"
-puts chord, "\n"
+puts scale, "\n"
 
 for i in (12).downto(1)
   fifth = 5
@@ -88,16 +88,16 @@ for i in (12).downto(1)
   step = ""
   if(i==3 or i==7)
     amount = (1+sixth)*-1
-    chord.transpose(amount)
+    scale.transpose(amount)
     step = 'HALF'
   else
     amount = (2+fifth)*-1
-    chord.transpose(amount)
+    scale.transpose(amount)
     step = 'WHOLE'
   end
 
-  letter = chord.notes[0].letter
+  letter = scale.notes[0].letter
   puts "#{letter} major chord\t\t#{step} STEP"
-  chord.fix_sharp_flats()
-  puts chord, "\n"
+  scale.fix_sharp_flats()
+  puts scale, "\n"
 end
