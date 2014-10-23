@@ -18,7 +18,7 @@ In the works. Input, capture, and transpose chords from midi input.
 - individual notes and chords (multiple notes) stored to notes buffer
 - display letters of recording
 
-###To-do
+#To-do
 
 - storing of chord progressions
 - circle of fifths voodoo
