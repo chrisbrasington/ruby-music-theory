@@ -4,7 +4,7 @@ load 'chord.rb'
 note = Note.new(48, 80, true, Time.now.getutc)
 scale = Chord.new([note])
 
-puts "\nC major chord\n\n"
+puts "\nC major scale\n\n"
 print "BEGIN\t",scale, "\n"
 #puts chord
 
@@ -25,7 +25,7 @@ puts
 puts "Shifting through scales...","\n"
 
 letter = scale.notes[0].letter
-puts "#{letter} major chord"
+puts "#{letter} major scale"
 puts scale, "\n"
 
 for i in 1..7
@@ -40,7 +40,7 @@ for i in 1..7
   end
 
   letter = scale.notes[0].letter
-  puts "#{letter} major chord\t\t#{step} STEP"
+  puts "#{letter} major scale\t\t#{step} STEP"
   puts scale, "\n"
 end
 
@@ -67,7 +67,7 @@ for i in 1..12
   end
 
   letter = scale.notes[0].letter
-  puts "#{letter} major chord\t\t#{step} STEP"
+  puts "#{letter} major scale\t\t#{step} STEP"
   scale.fix_sharp_flats()
   puts scale
   puts
@@ -78,7 +78,7 @@ puts "-----------------------------", "\n"
 puts "Circle of fifths to the left...", "\n"
 
 letter = scale.notes[0].letter
-puts "#{letter} major chord"
+puts "#{letter} major scale"
 puts scale, "\n"
 
 for i in (12).downto(1)
@@ -97,7 +97,7 @@ for i in (12).downto(1)
   end
 
   letter = scale.notes[0].letter
-  puts "#{letter} major chord\t\t#{step} STEP"
+  puts "#{letter} major scale\t\t#{step} STEP"
   scale.fix_sharp_flats()
   puts scale, "\n"
 end
