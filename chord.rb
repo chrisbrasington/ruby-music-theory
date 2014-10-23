@@ -3,7 +3,8 @@ load 'note.rb'
 # chord - arrangement of notes
 class Chord
 	attr_accessor :notes
-	
+
+  # accepts an array of notes
 	def initialize(notes)
 		@notes = notes
 	end
