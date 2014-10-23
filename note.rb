@@ -2,7 +2,6 @@ require 'singleton'
 
 # individual note
 class Note
-	
 	# letter value, key (int) 0-120 on full piano
 	# velocity and time_stamp
 	attr_accessor :letter, :key, :key_press, :velocity, :time_stamp
@@ -21,7 +20,7 @@ class Note
 		string = "#{letter}\tkey: #{key}\t\t"
     @key_press ? string += "press: down\t" : string += "press: up\t"
 		string +=  "velocity: #{velocity}\ttime: #{time_stamp}"
-	end
+  end
 
 	def down
 		key_press
@@ -29,7 +28,20 @@ class Note
 
 	def up
 		!key_press
-	end
+  end
+
+  # transpose note
+  # shift key note up or down
+  def transpose(amount)
+    @key += amount
+    @letter = Transcribe.key_to_letter(@key)
+  end
+
+  def flip_sharp_flat
+    letter = Transcribe.get_chromatic_scale[key]
+    (@letter[0] == "#") ? @letter = letter[1] : @letter = letter[0]
+    true
+  end
 
 end
 
