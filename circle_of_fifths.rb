@@ -54,15 +54,14 @@ puts scale, "\n"
 
 for i in 1..12
 
-  fifth = 5
-  sixth = 6
+  fifth = 7
 
   step = ""
   if(i==3 or i==7)
-    scale.transpose(1+sixth)
+    scale.transpose(fifth)
     step = "HALF"
   else
-    scale.transpose(2+fifth)
+    scale.transpose(fifth)
     step = "WHOLE"
   end
 
@@ -82,16 +81,15 @@ puts "#{letter} major scale"
 puts scale, "\n"
 
 for i in (12).downto(1)
-  fifth = 5
-  sixth = 6
+  fifth = 7
 
   step = ""
   if(i==3 or i==7)
-    amount = (1+sixth)*-1
+    amount = (fifth)*-1
     scale.transpose(amount)
     step = 'HALF'
   else
-    amount = (2+fifth)*-1
+    amount = (fifth)*-1
     scale.transpose(amount)
     step = 'WHOLE'
   end

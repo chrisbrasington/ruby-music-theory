@@ -33,7 +33,7 @@ class Chord
 
         needs_correction = false
         @notes.each{|n2|
-          if n2.letter == letter
+          if n2.letter == letter or @notes[0].letter[1] == 'b'
             needs_correction = true
           end
         }
