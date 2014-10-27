@@ -181,7 +181,7 @@ class Chord
 end
 
 class Scale
-  attr_accessor :notes
+  attr_accessor :notes, :type
 
   def initialize letter, placement
     key = Transcribe.letter_to_chromatic_placement(letter)
@@ -201,18 +201,47 @@ class Scale
       @notes.push(note)
     end
     Transcribe.fix_sharp_flats(@notes)
+
+    @type = "Major"
   end
 
   def to_s
-    c = ''
+    c = "#{@notes[0].letter} #{@type} scale\n"
     @notes.each{|n| c += "#{n.letter} "}
     c
   end
 
   def to_s_notes
     c = ''
-    @notes.each{|n| c += "#{n} \n"}
+    @notes.each{|n| c += "#{n}"}
     c
+  end
+
+  def transpose(amount)
+    @notes.each { |n| n.transpose(amount)}
+  end
+
+  def fifths_clockwise
+    @notes.each { |n| n.transpose(-5)}
+    Transcribe.fix_sharp_flats(@notes)
+  end
+
+  def fifths_counter_clockwise
+    @notes.each { |n| n.transpose(5)}
+    Transcribe.fix_sharp_flats(@notes)
+  end
+
+  def relative_minor
+    minor = "#{@notes[5].letter} Minor Scale (relative)\n"
+
+    for i in 5..7
+      minor += "#{@notes[i].letter} "
+    end
+    for i in 0..4
+      minor += "#{@notes[i].letter} "
+    end
+
+    minor
   end
 
 end
