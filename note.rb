@@ -1,3 +1,4 @@
+require 'micromidi'
 require 'singleton'
 
 # individual note
@@ -285,6 +286,10 @@ class Scale
     Transcribe.fix_sharp_flats(@notes)
   end
 
+  def octave (amount)
+    transpose(11*amount)
+  end
+
   # relative minor
   #   scale notes: 5,6,7,0,1,2,3,4
   def relative_minor
@@ -304,6 +309,30 @@ class Scale
       amount = (amount%7)
     end
     @degree = amount
+  end
+
+  def play_scale
+    key_begin = @notes[0].key
+    key_begin = @notes[0].key
+    @output = UniMIDI::Output.use(:first)
+    MIDI.using(@output) do
+      for i in 0..7
+        play key_begin, 0.25
+        key_begin += 1
+      end
+    end
+  end
+
+  def play_relative_minor
+    key_begin = @notes[5].key
+
+    @output = UniMIDI::Output.use(:first)
+    MIDI.using(@output) do
+      for i in 0..7
+        play key_begin, 0.25
+        key_begin += 1
+      end
+    end
   end
 
 end
