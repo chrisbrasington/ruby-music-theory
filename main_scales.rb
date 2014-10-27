@@ -1,9 +1,6 @@
 require 'observer'
 load 'note.rb'
 
-@output = UniMIDI::Output.use(:first)
-
-
 scale = Scale.new('C', 4)
 
 for i in 1..8
