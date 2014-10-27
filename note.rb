@@ -153,6 +153,24 @@ class Transcribe
     }
     notes
   end
+
+  def Transcribe.degree_name(degree)
+    if degree == 1
+      'Tonic'
+    elsif degree == 2
+      'Supertonic'
+    elsif degree == 3
+      'Mediant'
+    elsif degree == 4
+      'Subdominant'
+    elsif degree == 5
+      'Dominant'
+    elsif degree == 6
+      'Submediant'
+    elsif degree == 7
+      'Subtonic'
+    end
+  end
 end
 
 # chord - arrangement of notes
@@ -180,17 +198,23 @@ class Chord
   end
 end
 
+# scale - sequence of ordered notes by a fundamental pitch
 class Scale
-  attr_accessor :notes, :type
+  attr_accessor :notes, :type, :degree
 
+  # initialize based upon letter and placement on keyboard
   def initialize letter, placement
+
+    # correct key placement
     key = Transcribe.letter_to_chromatic_placement(letter)
     key += (12*placement) if placement
 
+    # tonic
     note = Note.new(key, 80, true, Time.now.getutc)
     @notes = []
     @notes.push(note)
 
+    # generate major scale of tonic
     for i in 1..7
       note = (note.dup)
       if i==3 or i==7
@@ -203,34 +227,66 @@ class Scale
     Transcribe.fix_sharp_flats(@notes)
 
     @type = "Major"
+    @degree = 1
   end
 
+  def get_scale_degree_name
+    Transcribe.degree_name(@degree)
+  end
+
+  def get_scale_at_degree
+    degree_notes = []
+
+    for i in @degree-1..6
+      degree_notes.push(@notes[i])
+    end
+    for i in 0..@degree-1
+      degree_notes.push(@notes[i])
+    end
+    degree_notes
+  end
+
+  # to string
   def to_s
-    c = "#{@notes[0].letter} #{@type} scale\n"
-    @notes.each{|n| c += "#{n.letter} "}
-    c
+    c = "#{@notes[0].letter} #{@type} scale (#{get_scale_degree_name})\n"
+    if @degree == 1
+      @notes.each{|n| c += "#{n.letter} "}
+      c
+    else
+      degree_notes = get_scale_at_degree
+      degree_notes.each { |n| c += "#{n.letter} "}
+      c
+    end
   end
 
+  # to string (detailed)
   def to_s_notes
     c = ''
     @notes.each{|n| c += "#{n}"}
     c
   end
 
+  # transpose notes by amount
   def transpose(amount)
     @notes.each { |n| n.transpose(amount)}
   end
 
-  def fifths_clockwise
+  # rotate scale along circle of fifths
+  #   (opposite direction to circle of fourths)
+  def fifths
     @notes.each { |n| n.transpose(-5)}
     Transcribe.fix_sharp_flats(@notes)
   end
 
-  def fifths_counter_clockwise
+  # rotate scale along circle of fourths
+  #   (opposite direction to circle of fifths)
+  def fourths
     @notes.each { |n| n.transpose(5)}
     Transcribe.fix_sharp_flats(@notes)
   end
 
+  # relative minor
+  #   scale notes: 5,6,7,0,1,2,3,4
   def relative_minor
     minor = "#{@notes[5].letter} Minor Scale (relative)\n"
 
@@ -240,8 +296,11 @@ class Scale
     for i in 0..4
       minor += "#{@notes[i].letter} "
     end
-
     minor
+  end
+
+  def set_degree(amount)
+    @degree = amount%7
   end
 
 end
