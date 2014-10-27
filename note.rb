@@ -31,6 +31,14 @@ class Note
 		!key_press
   end
 
+  def sharpen()
+    transpose(1)
+  end
+
+  def flatten()
+    transpose(-1)
+  end
+
   # transpose note
   # shift key note up or down
   def transpose(amount)
@@ -141,7 +149,10 @@ class Transcribe
 
         needs_correction = false
         notes.each{|n2|
-          if n2.letter == letter or notes[0].letter[1] == 'b'
+          if n2.letter == letter
+            needs_correction = true
+          end
+          if n2.letter[0] == letter[0] or n2.letter[0] == letter or n2.letter == letter[0]
             needs_correction = true
           end
         }
@@ -267,23 +278,22 @@ class Scale
     c
   end
 
-  # transpose notes by amount
+  #transpose notes by amount
   def transpose(amount)
     @notes.each { |n| n.transpose(amount)}
+    Transcribe.fix_sharp_flats(@notes)
   end
 
   # rotate scale along circle of fifths
   #   (opposite direction to circle of fourths)
   def fifths
-    @notes.each { |n| n.transpose(-5)}
-    Transcribe.fix_sharp_flats(@notes)
+    transpose(7)
   end
 
   # rotate scale along circle of fourths
   #   (opposite direction to circle of fifths)
   def fourths
-    @notes.each { |n| n.transpose(5)}
-    Transcribe.fix_sharp_flats(@notes)
+    transpose(-7)
   end
 
   def octave (amount)
@@ -293,15 +303,49 @@ class Scale
   # relative minor
   #   scale notes: 5,6,7,0,1,2,3,4
   def relative_minor
-    minor = "#{@notes[5].letter} Minor Scale (relative)\n"
+    minor_scale = Scale.new(@notes[5].letter,4)
+    minor_scale.to_minor
+    minor_scale
+  end
 
-    for i in 5..7
-      minor += "#{@notes[i].letter} "
-    end
-    for i in 0..4
-      minor += "#{@notes[i].letter} "
-    end
-    minor
+  # natural minor
+  # flatten 3rd, 6, 7th notes
+  def to_minor
+    minor_scale = Scale.new(@notes[0].letter,4)
+    minor_scale.notes[2].flatten
+    minor_scale.notes[5].flatten
+    minor_scale.notes[6].flatten
+    Transcribe.fix_sharp_flats(minor_scale.notes)
+    @notes = minor_scale.notes
+    @type = 'Minor (Natural)'
+  end
+
+  # harmonic minor
+  # flatten 3rd, 6th notes
+  def to_harmonic_minor
+    minor_scale = Scale.new(@notes[0].letter,4)
+    minor_scale.notes[2].flatten
+    minor_scale.notes[5].flatten
+    Transcribe.fix_sharp_flats(minor_scale.notes)
+    @notes = minor_scale.notes
+    @type = 'Minor (Harmonic)'
+  end
+
+  # melodic minor
+  # flatten 3rd note
+  def to_melodic_minor
+    minor_scale = Scale.new(@notes[0].letter,4)
+    # flatten 3rd, 6, 7th notes
+    minor_scale.notes[2].flatten
+    Transcribe.fix_sharp_flats(minor_scale.notes)
+    @notes = minor_scale.notes
+    @type = 'Minor (Melodic)'
+  end
+
+  def to_major
+    major_scale = Scale.new(@notes[0].letter,4)
+    @notes = major_scale.notes
+    @type = 'Major'
   end
 
   def set_degree(amount)
@@ -312,26 +356,22 @@ class Scale
   end
 
   def play_scale
-    key_begin = @notes[0].key
-    key_begin = @notes[0].key
+    notes = @notes
     @output = UniMIDI::Output.use(:first)
     MIDI.using(@output) do
-      for i in 0..7
-        play key_begin, 0.25
-        key_begin += 1
-      end
+      notes.each { |n|
+        play n.letter, 0.25
+      }
     end
   end
 
   def play_relative_minor
-    key_begin = @notes[5].key
-
+    notes = relative_minor.notes
     @output = UniMIDI::Output.use(:first)
     MIDI.using(@output) do
-      for i in 0..7
-        play key_begin, 0.25
-        key_begin += 1
-      end
+      notes.each { |n|
+        play n.letter, 0.25
+      }
     end
   end
 
