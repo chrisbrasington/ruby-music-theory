@@ -1,4 +1,4 @@
-load 'chord.rb'
+load 'note.rb'
 
 
 note = Note.new(48, 80, true, Time.now.getutc)
@@ -10,7 +10,7 @@ print "BEGIN\t",scale, "\n"
 
 for i in 1..7
   note = (note.dup)
-  if(i==3 or i==7)
+  if i==3 or i==7
     print "HALF  \t"
     note.transpose(1)
   else
@@ -31,7 +31,7 @@ puts scale, "\n"
 for i in 1..7
 
   step = ""
-  if(i==3 or i==7)
+  if i==3 or i==7
     scale.transpose(1)
     step = 'HALF'
   else
@@ -57,7 +57,7 @@ for i in 1..12
   fifth = 7
 
   step = ""
-  if(i==3 or i==7)
+  if i==3 or i==7
     scale.transpose(fifth)
     step = "HALF"
   else
@@ -67,7 +67,7 @@ for i in 1..12
 
   letter = scale.notes[0].letter
   puts "#{letter} major scale\t\t#{step} STEP"
-  scale.fix_sharp_flats()
+  Transcribe.fix_sharp_flats(scale.notes)
   puts scale
   puts
 end
@@ -84,7 +84,7 @@ for i in (12).downto(1)
   fifth = 7
 
   step = ""
-  if(i==3 or i==7)
+  if i==3 or i==7
     amount = (fifth)*-1
     scale.transpose(amount)
     step = 'HALF'
@@ -96,6 +96,6 @@ for i in (12).downto(1)
 
   letter = scale.notes[0].letter
   puts "#{letter} major scale\t\t#{step} STEP"
-  scale.fix_sharp_flats()
+  Transcribe.fix_sharp_flats(scale.notes)
   puts scale, "\n"
 end

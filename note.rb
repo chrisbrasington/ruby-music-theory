@@ -53,18 +53,18 @@ class Transcribe
   # chromatic_scale: all possible note variations
   @chromatic_scale =
       {
-          0 => 'A',
-          1 => ['A#','Bb'],
-          2 => 'B',
-          3 => 'C',
-          4 => ['C#','Db'],
-          5 => 'D',
-          6 => ['D#','Eb'],
-          7 => 'E' ,
-          8 => 'F',
-          9 => ['F#','Gb'],
-          10 => 'G',
-          11 => ['G#','Ab']
+          0 => 'C',
+          1 => ['C#','Db'],
+          2 => 'D',
+          3 => ['D#','Eb'],
+          4 => 'E' ,
+          5 => 'F',
+          6 => ['F#','Gb'],
+          7 => 'G',
+          8 => ['G#','Ab'],
+          9 => 'A',
+          10 => ['A#','Bb'],
+          11 => 'B'
       }
   # last_key: used to determine if black key should be
   #   sharpened or flatted by direction of interval
@@ -89,10 +89,26 @@ class Transcribe
     @last_note
   end
 
+  # give letter, returns placement in chromatic scale
+  def Transcribe.letter_to_chromatic_placement(letter)
+    @chromatic_scale.each{|n|
+      count = n[0]
+      current = n[1]
+      if current.length > 1
+        if current[0] == letter or current[1] == letter
+          return count
+        end
+      elsif current == letter
+        return count
+      end
+    }
+    return false
+  end
+
   # translate single key (int) to note letter
   def Transcribe.key_to_letter(key)
-    letter = @chromatic_scale[(key+3)%12]
-    # if sharp orflat, choose which
+    letter = @chromatic_scale[(key)%12]
+    # if sharp or flat, choose which
     (@last_key < key) ? letter = letter[0] : letter = letter[1] if letter.size != 1
     @last_key = key
     @last_note = letter
@@ -116,4 +132,87 @@ class Transcribe
     end
     return notes
   end
+
+  def Transcribe.fix_sharp_flats(notes)
+    notes.each{ |n|
+      if n.letter.include?'#'
+        letter = n.letter[0]
+
+        needs_correction = false
+        notes.each{|n2|
+          if n2.letter == letter or notes[0].letter[1] == 'b'
+            needs_correction = true
+          end
+        }
+        if needs_correction
+          key = (n.key)%12
+          old = n.letter
+          n.letter = Transcribe.get_chromatic_scale[key][1]
+        end
+      end
+    }
+    notes
+  end
+end
+
+# chord - arrangement of notes
+class Chord
+  attr_accessor :notes
+
+  # accepts an array of notes
+  def initialize(notes)
+    @notes = []
+    notes.each{|note| @notes.push(note)}
+  end
+
+  def to_s
+    c = ''
+    @notes.each{|n| c += "#{n.letter} "}
+    c
+  end
+
+  def add_note(note)
+    @notes.push(note)
+  end
+
+  def transpose(amount)
+    @notes.each { |n| n.transpose(amount)}
+  end
+end
+
+class Scale
+  attr_accessor :notes
+
+  def initialize letter, placement
+    key = Transcribe.letter_to_chromatic_placement(letter)
+    key += (12*placement) if placement
+
+    note = Note.new(key, 80, true, Time.now.getutc)
+    @notes = []
+    @notes.push(note)
+
+    for i in 1..7
+      note = (note.dup)
+      if i==3 or i==7
+        note.transpose(1)
+      else
+        note.transpose(2)
+      end
+      @notes.push(note)
+    end
+    Transcribe.fix_sharp_flats(@notes)
+  end
+
+  def to_s
+    c = ''
+    @notes.each{|n| c += "#{n.letter} "}
+    c
+  end
+
+  def to_s_notes
+    c = ''
+    @notes.each{|n| c += "#{n} \n"}
+    c
+  end
+
 end

@@ -1,6 +1,6 @@
 require 'unimidi'
 require 'observer'
-load 'chord.rb'
+load 'note.rb'
 
 # state observer
 class State
