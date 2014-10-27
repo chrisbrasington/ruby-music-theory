@@ -300,7 +300,10 @@ class Scale
   end
 
   def set_degree(amount)
-    @degree = amount%7
+    if amount > 7
+      amount = (amount%7)
+    end
+    @degree = amount
   end
 
 end
