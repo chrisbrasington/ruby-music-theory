@@ -2,11 +2,21 @@
 
 In the works. Input, capture, and transpose chords from midi input.
 
-#Implemented
+##Implemented
+
+###Theory - Cirlce of Fifths/Fourths operations
+- Traversal of circle of 4ths/5ths from any location
+- Scale creation by letter name
+- Minor Transform/View - Natural, Harmonic, Melodic, and Relative
+- scales kept in defined degree
+- scale modes
 
 ###Input
 - concurrent midi controller and computer keyboard inputs
 - debug midi input as note object
+
+###Output
+- playback scales to midi
 
 ###Translation
 - midi key to note object 
@@ -18,11 +28,10 @@ In the works. Input, capture, and transpose chords from midi input.
 - individual notes and chords (multiple notes) stored to notes buffer
 - display letters of recording
 
-#To-do
+###To-do
 
+- latin names of scale modes
 - storing of chord progressions
-- circle of fifths voodoo
-- transposition of chords
-- output to midi
-- (possible) scale detection
+- figuring out which scales chords/triads fit into
+- more output to midi
 - other music theory magic
