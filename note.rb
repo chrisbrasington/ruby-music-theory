@@ -31,12 +31,33 @@ class Note
 		!key_press
   end
 
+  def sharp?
+    return true if not letter[1].nil? and letter[1] == "\#"
+    false
+  end
+
+  def flat?
+    return true if not letter[1].nil? and letter[1] == 'b'
+    false
+  end
+
   def sharpen()
-    transpose(1)
+    if sharp? or flat?
+      transpose(1)
+    elsif
+    @key += 1
+      @letter += '\#'
+    end
   end
 
   def flatten()
-    transpose(-1)
+    if sharp? or flat?
+      transpose(-1)
+    elsif
+      @key -= 1
+      @letter += 'b'
+    end
+
   end
 
   # transpose note
@@ -44,6 +65,10 @@ class Note
   def transpose(amount)
     @key += amount
     @letter = Transcribe.key_to_letter(@key)
+  end
+
+  def octave(amount)
+    transpose(11*amount)
   end
 
   def flip_sharp_flat
@@ -73,7 +98,7 @@ class Transcribe
           8 => ['G#','Ab'],
           9 => 'A',
           10 => ['A#','Bb'],
-          11 => 'B'
+          11 => ['B', 'Cb']   # weird enharmonics
       }
   # last_key: used to determine if black key should be
   #   sharpened or flatted by direction of interval
@@ -111,6 +136,15 @@ class Transcribe
         return count
       end
     }
+    if letter == 'B#'
+      return 0
+    elsif letter == 'Cb'
+      return 11
+    elsif letter == 'E#'
+      return 5
+    elsif letter == 'Fb'
+      return 4
+    end
     return false
   end
 
@@ -140,30 +174,6 @@ class Transcribe
       end
     end
     return notes
-  end
-
-  def Transcribe.fix_sharp_flats(notes)
-    notes.each{ |n|
-      if n.letter.include?'#'
-        letter = n.letter[0]
-
-        needs_correction = false
-        notes.each{|n2|
-          if n2.letter == letter
-            needs_correction = true
-          end
-          if n2.letter[0] == letter[0] or n2.letter[0] == letter or n2.letter == letter[0]
-            needs_correction = true
-          end
-        }
-        if needs_correction
-          key = (n.key)%12
-          old = n.letter
-          n.letter = Transcribe.get_chromatic_scale[key][1]
-        end
-      end
-    }
-    notes
   end
 
   def Transcribe.degree_name(degree)
@@ -216,30 +226,16 @@ class Scale
 
   # initialize based upon letter and placement on keyboard
   def initialize letter, placement
+    @placement = placement
+    @type = "Major"
+    @degree = 1
 
     # correct key placement
     key = Transcribe.letter_to_chromatic_placement(letter)
     key += (12*placement) if placement
 
-    # tonic
-    note = Note.new(key, 80, true, Time.now.getutc)
-    @notes = []
-    @notes.push(note)
+    find_scale(letter)
 
-    # generate major scale of tonic
-    for i in 1..7
-      note = (note.dup)
-      if i==3 or i==7
-        note.transpose(1)
-      else
-        note.transpose(2)
-      end
-      @notes.push(note)
-    end
-    Transcribe.fix_sharp_flats(@notes)
-
-    @type = "Major"
-    @degree = 1
   end
 
   def get_scale_degree_name
@@ -260,7 +256,11 @@ class Scale
 
   # to string
   def to_s
-    c = "#{@notes[0].letter} #{@type} scale (#{get_scale_degree_name})\n"
+    c = "#{@notes[0].letter} #{@type} scale "
+    if @degree != 1
+      c += "(#{get_scale_degree_name})\n"
+    end
+    c += "\n"
     if @degree == 1
       @notes.each{|n| c += "#{n.letter} "}
       c
@@ -278,22 +278,131 @@ class Scale
     c
   end
 
-  #transpose notes by amount
-  def transpose(amount)
-    @notes.each { |n| n.transpose(amount)}
-    Transcribe.fix_sharp_flats(@notes)
+  def find_scale(letter)
+
+    # tonic
+    note = Note.new(48, 80, true, Time.now.getutc)
+    @notes = []
+    @notes.push(note)
+
+
+    # generate major scale of tonic
+    for i in 1..7
+      note = (note.dup)
+      if i==3 or i==7
+        note.transpose(1)
+      else
+        note.transpose(2)
+      end
+      @notes.push(note)
+    end
+
+    if @notes.first.letter != letter
+
+      # back up beginning of search to revisit if necessary
+      start = []
+      @notes.each { |n| start.push(n.dup) }
+
+      # fifths - clockwise search
+      for i in 0..6
+        if @notes.first.letter != letter
+          fifths
+        end
+      end
+      # fourths - clockwise search
+      if @notes.first.letter != letter
+        @notes = start
+        for i in 0..6
+          if @notes.first.letter != letter
+            fourths
+          end
+        end
+      end
+    end
+
+    if @notes.first.letter != letter
+      puts "Unable to create #{letter} scale, sorry",''
+    end
   end
 
   # rotate scale along circle of fifths
   #   (opposite direction to circle of fourths)
+  #
+  # [1, 2, 3, 4]  [5, 6, 7]
+  #   splits swaps to begin on the 5th
+  # [5, 6, 7] [1, 2, 3, 4 (sharpens)]
+  #   sharpen the 7th note
+  #   (also known as the prior 4th)
+  #
+  # notes:
+  #   zero-indexed
+  #   copy beginning note to end
+  #   maintains sharps as it circles clockwise
   def fifths
-    transpose(7)
+    shifted_notes = []
+
+    for i in 4..6
+      shifted_notes.push(@notes[i])
+      shifted_notes.last.key -= 12
+    end
+    for i in 0..3
+      shifted_notes.push(@notes[i])
+    end
+    shifted_notes.push(shifted_notes[0].dup)
+    shifted_notes.last.key += 12
+
+    # keep shifting near placement range (say, middle of keyboard)
+    shifted_notes.each { |n| n.key+= 12 } if shifted_notes[0].key < 12*@placement
+
+    # sharpen the 7th note
+    if shifted_notes[6].flat?
+      shifted_notes[6].letter = shifted_notes[6].letter[0]
+    else
+      shifted_notes[6].letter += "\#"
+      shifted_notes[3].key += 1
+    end
+
+    @notes = shifted_notes
   end
 
   # rotate scale along circle of fourths
   #   (opposite direction to circle of fifths)
+  #
+  # [1, 2, 3] [4, 5, 6, 7]
+  #   splits swaps to begin on the 4th
+  # [4, 5, 6, 7 (flatten)] [1, 2, 3]
+  #   flattens the 4th note
+  #   (also known as the prior 7th)
+  #
+  # notes:
+  #   zero-indexed
+  #   copy beginning note to end
+  #   maintains flats as it circles counterclockwise
   def fourths
-    transpose(-7)
+    shifted_notes = []
+
+    for i in 3..6
+      shifted_notes.push(@notes[i])
+    end
+    for i in 0..2
+      shifted_notes.push(@notes[i].dup)
+      shifted_notes.last.key += 12
+    end
+    shifted_notes.push(shifted_notes[0].dup)
+    shifted_notes.last.key += 12
+
+    # keep shifting near placement range (say, middle of keyboard)
+    shifted_notes.each { |n| n.key-= 12 } if shifted_notes[0].key > 12*@placement
+
+    # flatten the 4th note
+    if shifted_notes[3].sharp?
+      shifted_notes[3].letter = shifted_notes[3].letter[0]
+    else
+      shifted_notes[3].letter += "b"
+      shifted_notes[3].key -= 1
+    end
+
+    @notes = shifted_notes
   end
 
   def octave (amount)
@@ -303,19 +412,35 @@ class Scale
   # relative minor
   #   scale notes: 5,6,7,0,1,2,3,4
   def relative_minor
-    minor_scale = Scale.new(@notes[5].letter,4)
-    minor_scale.to_minor
+    minor_scale = self.dup
+    major = minor_scale.notes.first.letter
+    notes = []
+    for i in 5..6
+      notes.push(@notes[i].dup)
+    end
+    for i in 0..4
+      notes.push(@notes[i].dup)
+      notes.last.key += 12
+    end
+    notes.push(notes.first.dup)
+    notes.last.key += 12
+
+    # keep shifting near placement range (say, middle of keyboard)
+    notes.each { |n| n.key-= 12 } if notes[0].key > 12*@placement
+
+    minor_scale.notes = notes
+    minor_scale.type = "Minor (Relative to #{major} Major)"
     minor_scale
   end
 
   # natural minor
   # flatten 3rd, 6, 7th notes
   def to_minor
-    minor_scale = Scale.new(@notes[0].letter,4)
+    to_major if @type != 'Major'
+    minor_scale = self.dup
     minor_scale.notes[2].flatten
     minor_scale.notes[5].flatten
     minor_scale.notes[6].flatten
-    Transcribe.fix_sharp_flats(minor_scale.notes)
     @notes = minor_scale.notes
     @type = 'Minor (Natural)'
   end
@@ -323,10 +448,10 @@ class Scale
   # harmonic minor
   # flatten 3rd, 6th notes
   def to_harmonic_minor
-    minor_scale = Scale.new(@notes[0].letter,4)
+    to_major if @type != 'Major'
+    minor_scale = self.dup
     minor_scale.notes[2].flatten
     minor_scale.notes[5].flatten
-    Transcribe.fix_sharp_flats(minor_scale.notes)
     @notes = minor_scale.notes
     @type = 'Minor (Harmonic)'
   end
@@ -334,10 +459,9 @@ class Scale
   # melodic minor
   # flatten 3rd note
   def to_melodic_minor
-    minor_scale = Scale.new(@notes[0].letter,4)
-    # flatten 3rd, 6, 7th notes
+    to_major if @type != 'Major'
+    minor_scale = self.dup
     minor_scale.notes[2].flatten
-    Transcribe.fix_sharp_flats(minor_scale.notes)
     @notes = minor_scale.notes
     @type = 'Minor (Melodic)'
   end
@@ -357,20 +481,22 @@ class Scale
 
   def play_scale
     notes = @notes
+    puts notes
     @output = UniMIDI::Output.use(:first)
     MIDI.using(@output) do
       notes.each { |n|
-        play n.letter, 0.25
+        play n.key, 0.25
       }
     end
   end
 
   def play_relative_minor
     notes = relative_minor.notes
+    puts notes
     @output = UniMIDI::Output.use(:first)
     MIDI.using(@output) do
       notes.each { |n|
-        play n.letter, 0.25
+        play n.key, 0.25
       }
     end
   end
