@@ -19,13 +19,16 @@ end
 # handles concurrent midi and pc keyboard input
 class Input
 	include Observable
-	attr_accessor :midi, :midi_thread, :keyboard_thread, :notes_buffer, :recording
+	attr_accessor :midi, :midi_thread, :keyboard_thread, :notes_buffer, :recording, :searching
 
 	def initialize
 		add_observer(State.new)
 
     # toggle for recording
 		@recording = false
+
+    # toggle for searching
+    @searching = false
 
     # select midi device
 		@midi = UniMIDI::Input.first
@@ -49,7 +52,7 @@ class Input
 
 	# menu of commands
 	def menu
-		puts 'Commands: r (record chord), m (midi device select), h (help), q (quit)'
+		puts 'Commands: r (record), s (search notes in scale), m (midi device select), h (help), q (quit)'
 		puts 'Debug Midi input running...'
 	end
 
@@ -79,19 +82,28 @@ class Input
 
       # if recording and keyboard input
       # end recording
-			if @recording
-        puts 'Done Recording'
-        @recording = false
+			if @recording or @searching
+        if @recording
+          puts 'Done Recording'
+          @recording = false
 
-        # create and show new chord
-        chord = Chord.new(@notes_buffer)
-        puts chord
+          # create and show new chord
+          chord = Chord.new(@notes_buffer)
+          puts chord
+        end
+        if not @recording and @searching
+          puts '', 'Searching...'
+          @searching = false
+          Transcribe.search(Chord.new(@notes_buffer))
+
+        end
       else
         # quit
         if key == 'q' or key == 'quit'
           changed
           notify_observers(self)
           puts 'Quitting'
+          Thread.kill(@midi_thread)
           exit
         # help
         elsif key == 'h' or key == 'help'
@@ -108,6 +120,11 @@ class Input
           changed
           notify_observers(self)
           chord_record
+        # search mode
+        elsif key == 's' or key == 'search'
+          changed
+          notify_observers(self)
+          search
         # unknown
         else
           puts 'Unknown command'
@@ -125,7 +142,13 @@ class Input
     # flip toggle, clear notes buffer
 		@recording = true
 		@notes_buffer = []
-	end
+  end
+
+  def search
+    puts 'Record notes to search:'
+    @searching = true
+    chord_record
+  end
 end
 
 # run

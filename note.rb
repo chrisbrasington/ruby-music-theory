@@ -193,16 +193,50 @@ class Transcribe
       'Subtonic'
     end
   end
+
+  # search for notes in scale
+  def Transcribe.search(chord)
+    puts
+
+    # C scale, circle'd by fifths
+    scale = Scale.new('F', 4)
+    for i in 0..6
+      scale.fifths
+      found = scale.notes?(chord)
+      if found > chord.size/2
+        puts scale
+        print found, '/', chord.size, ' found'
+        puts '', ''
+      end
+      break;
+    end
+
+    # F scale, circle'd by fourths
+    scale = Scale.new('C',4)
+    for i in 0..6
+      scale.fourths
+      found = scale.notes?(chord)
+      if found > chord.size/2
+        puts scale
+        print found, '/', chord.size, ' found'
+        puts '', ''
+      end
+    end
+  end
 end
 
 # chord - arrangement of notes
 class Chord
-  attr_accessor :notes
+  attr_accessor :notes, :size
 
   # accepts an array of notes
   def initialize(notes)
     @notes = []
-    notes.each{|note| @notes.push(note)}
+    @size = 0
+    notes.each{|note|
+      @notes.push(note)
+      @size += 1
+    }
   end
 
   def to_s
@@ -357,9 +391,10 @@ class Scale
     # sharpen the 7th note
     if shifted_notes[6].flat?
       shifted_notes[6].letter = shifted_notes[6].letter[0]
+      shifted_notes[6].key += 1
     else
       shifted_notes[6].letter += "\#"
-      shifted_notes[3].key += 1
+      shifted_notes[6].key += 1
     end
 
     @notes = shifted_notes
@@ -397,6 +432,7 @@ class Scale
     # flatten the 4th note
     if shifted_notes[3].sharp?
       shifted_notes[3].letter = shifted_notes[3].letter[0]
+      shifted_notes[3].key -= 1
     else
       shifted_notes[3].letter += "b"
       shifted_notes[3].key -= 1
@@ -501,4 +537,24 @@ class Scale
     end
   end
 
+  # return number of notes found in this scale
+  def notes?(chord)
+    found = false
+    count = 0
+
+    # check each note against scale
+    chord.notes.each{|recorded_note|
+      @notes.each{|current|
+        if recorded_note.key%12 == current.key%12
+          found = true
+        end
+      }
+      # record single hit
+      if found
+        count += 1
+        found = false
+      end
+    }
+    count
+  end
 end
