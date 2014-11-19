@@ -82,7 +82,7 @@ class Input
 
       # if recording and keyboard input
       # end recording
-			if @recording or @searching
+      if @recording or @searching
         if @recording
           puts 'Done Recording'
           @recording = false
