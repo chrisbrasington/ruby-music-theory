@@ -208,7 +208,6 @@ class Transcribe
         print found, '/', chord.size, ' found'
         puts '', ''
       end
-      break;
     end
 
     # F scale, circle'd by fourths
