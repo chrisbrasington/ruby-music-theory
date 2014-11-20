@@ -198,6 +198,7 @@ class Transcribe
     end
   end
 
+  # should this playback notes?
   def Transcribe.playback
     @playback
   end
@@ -205,6 +206,8 @@ class Transcribe
   # search for notes in scale
   def Transcribe.search(chord)
     puts
+
+    # Major Scale Searches
 
     # C scale, circle'd by fifths
     scale = Scale.new('F', 4)
@@ -231,6 +234,13 @@ class Transcribe
         scale.play_notes if Transcribe.playback
       end
     end
+
+    # Minor (relative) Scale Searches
+    #   don't have to do this here
+    #   if we get a hit in a major scale,
+    #   it's implied the relative minor has the same hits
+    # This will likely be removed
+    #   when implementing storing of scales found
 
     # A minor scale, circle'd by fifths
     scale = Scale.new('F', 4)
@@ -267,10 +277,12 @@ class Transcribe
     puts @playback ? 'Playback: ON' : 'Playback: OFF'
   end
 
+  # set midi output device
   def Transcribe.set_output
     @output = UniMIDI::Output.gets
   end
 
+  # get midi output device
   def Transcribe.get_output
     @output
   end
@@ -365,6 +377,7 @@ class Scale
     c
   end
 
+  # find scale by letter
   def find_scale(letter)
 
     # tonic
@@ -555,6 +568,8 @@ class Scale
     @type = 'Minor (Melodic)'
   end
 
+  # to major scale
+  #    easiest to create from scratch
   def to_major
     major_scale = Scale.new(@notes[0].letter,4)
     @notes = major_scale.notes
@@ -568,6 +583,7 @@ class Scale
     @degree = amount
   end
 
+  # play notes in scale
   def play_notes
     notes = @notes
     @output = Transcribe.get_output

@@ -135,11 +135,12 @@ class Input
           changed
           notify_observers(self)
           search
-        # unknown
+        # toggle playback
         elsif key == 'p' or key == 'play'
           changed
           notify_observers(self)
           Transcribe.play_toggle
+        # unknown
         else
           puts 'Unknown command'
           menu
@@ -162,6 +163,8 @@ class Input
   # begin search
   def search
     puts 'Record notes to search:'
+
+    # flip toggle, begin recording
     @searching = true
     chord_record
   end
