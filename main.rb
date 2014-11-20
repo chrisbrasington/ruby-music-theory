@@ -1,4 +1,4 @@
-require 'unimidi'
+require 'micromidi'
 require 'observer'
 load 'note.rb'
 
