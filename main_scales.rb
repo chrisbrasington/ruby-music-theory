@@ -43,4 +43,4 @@ puts 'Coup de grâce: Jump to any scale from scratch', ''
 scale = Scale.new('Ab',4)
 scale.to_minor
 puts scale
-scale.play_scale
+scale.play_notes
