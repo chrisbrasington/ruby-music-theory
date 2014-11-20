@@ -83,7 +83,7 @@ end
 class Transcribe
   include Singleton
 
-  attr_accessor :chromatic_scale, :last_key, :last_note, :playback
+  attr_accessor :chromatic_scale, :last_key, :last_note, :playback, :output
   # chromatic_scale: all possible note variations
   @chromatic_scale =
       {
@@ -109,6 +109,8 @@ class Transcribe
   @last_note = 'A'
 
   @playback = false
+
+  @output = UniMIDI::Output.use(:first)
 
   # get chromatic scale
   def Transcribe.get_chromatic_scale
@@ -262,7 +264,18 @@ class Transcribe
   # toggle playback
   def Transcribe.play_toggle
     @playback = !@playback
+    puts @playback ? 'Playback: ON' : 'Playback: OFF'
   end
+
+  def Transcribe.set_output
+    @output = UniMIDI::Output.gets
+  end
+
+  def Transcribe.get_output
+    @output
+  end
+
+
 end
 
 # chord - arrangement of notes
@@ -557,7 +570,7 @@ class Scale
 
   def play_notes
     notes = @notes
-    @output = UniMIDI::Output.use(:first)
+    @output = Transcribe.get_output
     MIDI.using(@output) do
       notes.each { |n|
         play n.key, 0.25

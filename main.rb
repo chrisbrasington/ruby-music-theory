@@ -124,6 +124,7 @@ class Input
           changed
           notify_observers(self)
           @midi = UniMIDI::Input.gets
+          Transcribe.set_output
         # recording mode
         elsif key == 'r' or key == 'record'
           changed
