@@ -213,7 +213,7 @@ class Transcribe
         puts scale
         print found, '/', chord.size, ' found'
         puts '', ''
-        scale.play if Transcribe.playback
+        scale.play_notes if Transcribe.playback
       end
     end
 
@@ -226,7 +226,7 @@ class Transcribe
         puts scale
         print found, '/', chord.size, ' found'
         puts '', ''
-        scale.play if Transcribe.playback
+        scale.play_notes if Transcribe.playback
       end
     end
 
@@ -239,7 +239,7 @@ class Transcribe
         puts scale.relative_minor
         print found, '/', chord.size, ' found'
         puts '', ''
-        scale.relative_minor.play if Transcribe.playback
+        scale.relative_minor.play_notes if Transcribe.playback
       end
     end
 
@@ -252,7 +252,7 @@ class Transcribe
         puts scale.relative_minor
         print found, '/', chord.size, ' found'
         puts '', ''
-        scale.relative_minor.play if Transcribe.playback
+        scale.relative_minor.play_notes if Transcribe.playback
       end
     end
 
@@ -555,7 +555,7 @@ class Scale
     @degree = amount
   end
 
-  def play
+  def play_notes
     notes = @notes
     @output = UniMIDI::Output.use(:first)
     MIDI.using(@output) do
