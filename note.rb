@@ -83,7 +83,7 @@ end
 class Transcribe
   include Singleton
 
-  attr_accessor :chromatic_scale, :last_key, :last_note
+  attr_accessor :chromatic_scale, :last_key, :last_note, :playback
   # chromatic_scale: all possible note variations
   @chromatic_scale =
       {
@@ -107,6 +107,8 @@ class Transcribe
   # last_note: last evaluated note value
   #   stored if flat/sharp key is pressed twice
   @last_note = 'A'
+
+  @playback = false
 
   # get chromatic scale
   def Transcribe.get_chromatic_scale
@@ -194,6 +196,10 @@ class Transcribe
     end
   end
 
+  def Transcribe.playback
+    @playback
+  end
+
   # search for notes in scale
   def Transcribe.search(chord)
     puts
@@ -207,6 +213,7 @@ class Transcribe
         puts scale
         print found, '/', chord.size, ' found'
         puts '', ''
+        scale.play if Transcribe.playback
       end
     end
 
@@ -219,6 +226,7 @@ class Transcribe
         puts scale
         print found, '/', chord.size, ' found'
         puts '', ''
+        scale.play if Transcribe.playback
       end
     end
 
@@ -231,6 +239,7 @@ class Transcribe
         puts scale.relative_minor
         print found, '/', chord.size, ' found'
         puts '', ''
+        scale.relative_minor.play if Transcribe.playback
       end
     end
 
@@ -243,10 +252,16 @@ class Transcribe
         puts scale.relative_minor
         print found, '/', chord.size, ' found'
         puts '', ''
+        scale.relative_minor.play if Transcribe.playback
       end
     end
 
     puts 'Done Searching'
+  end
+
+  # toggle playback
+  def Transcribe.play_toggle
+    @playback = !@playback
   end
 end
 
@@ -549,6 +564,7 @@ class Scale
         puts n
       }
     end
+    puts
   end
 
   # return number of notes found in this scale

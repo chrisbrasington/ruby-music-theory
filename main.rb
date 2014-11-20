@@ -30,6 +30,9 @@ class Input
     # toggle for searching
     @searching = false
 
+    # toggle for playback
+    @playback = false
+
     # select midi device
 		@midi = UniMIDI::Input.first
 
@@ -52,7 +55,13 @@ class Input
 
 	# menu of commands
 	def menu
-		puts 'Commands: r (record), s (search notes in scale), m (midi device select), h (help), q (quit)'
+		puts 'Commands:'
+    puts 'r (record)'
+    puts 's (search notes in scale)'
+    puts 'p (playback recording/found notes)'
+    puts 'm (midi device select)'
+    puts 'h (help)'
+    puts 'q (quit)'
 		puts 'Debug Midi input running...'
 	end
 
@@ -126,6 +135,10 @@ class Input
           notify_observers(self)
           search
         # unknown
+        elsif key == 'p' or key == 'play'
+          changed
+          notify_observers(self)
+          Transcribe.play_toggle
         else
           puts 'Unknown command'
           menu
@@ -134,6 +147,7 @@ class Input
 			end
 		end
 	end
+
 
   # begin chord recording
 	def chord_record
@@ -144,6 +158,7 @@ class Input
 		@notes_buffer = []
   end
 
+  # begin search
   def search
     puts 'Record notes to search:'
     @searching = true
