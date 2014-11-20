@@ -203,7 +203,7 @@ class Transcribe
     for i in 0..6
       scale.fifths
       found = scale.notes?(chord)
-      if found > chord.size/2
+      if found >= chord.size
         puts scale
         print found, '/', chord.size, ' found'
         puts '', ''
@@ -215,12 +215,38 @@ class Transcribe
     for i in 0..6
       scale.fourths
       found = scale.notes?(chord)
-      if found > chord.size/2
+      if found > chord.size
         puts scale
         print found, '/', chord.size, ' found'
         puts '', ''
       end
     end
+
+    # A minor scale, circle'd by fifths
+    scale = Scale.new('F', 4)
+    for i in 0..6
+      scale.fifths
+      found = scale.relative_minor.notes?(chord)
+      if found >= chord.size
+        puts scale.relative_minor
+        print found, '/', chord.size, ' found'
+        puts '', ''
+      end
+    end
+
+    # D minor scale, circle'd by fourths
+    scale = Scale.new('C',4)
+    for i in 0..6
+      scale.fourths
+      found = scale.relative_minor.notes?(chord)
+      if found > chord.size
+        puts scale.relative_minor
+        print found, '/', chord.size, ' found'
+        puts '', ''
+      end
+    end
+
+    puts 'Done Searching'
   end
 end
 
@@ -514,24 +540,13 @@ class Scale
     @degree = amount
   end
 
-  def play_scale
+  def play
     notes = @notes
-    puts notes
     @output = UniMIDI::Output.use(:first)
     MIDI.using(@output) do
       notes.each { |n|
         play n.key, 0.25
-      }
-    end
-  end
-
-  def play_relative_minor
-    notes = relative_minor.notes
-    puts notes
-    @output = UniMIDI::Output.use(:first)
-    MIDI.using(@output) do
-      notes.each { |n|
-        play n.key, 0.25
+        puts n
       }
     end
   end
