@@ -110,7 +110,11 @@ class Transcribe
 
   @playback = false
 
-  @output = UniMIDI::Output.use(:first)
+  if UniMIDI::Output.all[0].nil?
+    puts 'No Midi Output Devices'
+  else
+    @output = UniMIDI::Output.use(:first)
+  end
 
   # get chromatic scale
   def Transcribe.get_chromatic_scale
@@ -589,11 +593,9 @@ class Scale
     @output = Transcribe.get_output
     MIDI.using(@output) do
       notes.each { |n|
-        play n.key, 0.25
-        puts n
+        play n.key, 0.01
       }
     end
-    puts
   end
 
   # return number of notes found in this scale

@@ -34,7 +34,11 @@ class Input
     @playback = false
 
     # select midi device
-		@midi = UniMIDI::Input.first
+    if UniMIDI::Input.all[0].nil?
+      puts 'No Midi Input Devices'
+    else
+      @midi = UniMIDI::Input.use(:first)
+    end
 
 		# midi thread for input
 		@midi_thread = Thread.new {
