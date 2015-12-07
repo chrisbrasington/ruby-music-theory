@@ -593,7 +593,7 @@ class Scale
     @output = Transcribe.get_output
     MIDI.using(@output) do
       notes.each { |n|
-        play n.key, 0.01
+        play n.key, 0.25
       }
     end
   end
