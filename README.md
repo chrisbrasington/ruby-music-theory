@@ -7,7 +7,7 @@ Analysis of music theory from midi controller interation.
 ###Recording
 - individual notes and chords (multiple notes) stored to notes buffer
 
-###Theory - Cirlce of Fifths/Fourths operations
+###Theory - Circle of Fifths/Fourths operations
 - Traversal of circle of 4ths/5ths from any location
 - Scale creation by letter name
 - Minor Transform/View - Natural, Harmonic, Melodic, and Relative
